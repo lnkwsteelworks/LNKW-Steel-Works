@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Checkout</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+    font-family:Arial;
+    background:#f7f7f7;
+}
+.box{
+    width:90%;
+    max-width:600px;
+    margin:20px auto;
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+}
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    font-size:16px;
+}
+button{
+    width:100%;
+    padding:14px;
+    margin-top:15px;
+    font-size:18px;
+    background:#25D366;   /* WhatsApp Green */
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+button:hover{
+    background:#1ebe5d;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<h2>Order Summary</h2>
+<div id="summary"></div>
+
+<h3>Customer Details</h3>
+<input id="name" placeholder="Name">
+<input id="phone" placeholder="Phone">
+
+<button onclick="sendOrder()">Continue to WhatsApp</button>
+</div>
+
+<script>
+// PRIORITY: Selected items from cart
+let cart = [];
+let source = "";
+
+// Use checkoutItems if exists, else buyNow, else full cart
+if (localStorage.getItem("checkoutItems")) {
+    cart = JSON.parse(localStorage.getItem("checkoutItems"));
+    source = "checkoutItems";
+} else if (localStorage.getItem("buyNow")) {
+    cart = JSON.parse(localStorage.getItem("buyNow"));
+    source = "buyNow";
+} else {
+    cart = JSON.parse(localStorage.getItem("cart")) || [];
+    source = "cart";
+}
+
+let summaryBox = document.getElementById("summary");
+let message = "";
+let total = 0;
+
+/* SHOW SUMMARY */
+cart.forEach(item => {
+    let itemTotal = item.price * item.qty;
+    total += itemTotal;
+
+    summaryBox.innerHTML += `
+        <p>
+            <b>${item.name}</b><br>
+            Code: ${item.code}<br>
+            Colour: ${item.color}<br>
+            Qty: ${item.qty}<br>
+            Price: Rs.${item.price}<br>
+            Item Total: Rs.${itemTotal}
+        </p><hr>
+    `;
+
+    message +=
+        `${item.name}%0A`+
+        `Code: ${item.code}%0A`+
+        `Colour: ${item.color}%0A`+
+        `Qty: ${item.qty}%0A`+
+        `Price: Rs.${item.price}%0A`+
+        `Item Total: Rs.${itemTotal}%0A%0A`;
+});
+
+/* SEND TO WHATSAPP */
+function sendOrder() {
+    let name = document.getElementById("name").value.trim();
+    let phone = document.getElementById("phone").value.trim();
+
+    if (!name || !phone) {
+        alert("Please fill customer details");
+        return;
+    }
+
+    // Use checkoutItems if exists, otherwise buyNow, otherwise cart
+    let items = localStorage.getItem("checkoutItems")
+        ? JSON.parse(localStorage.getItem("checkoutItems"))
+        : localStorage.getItem("buyNow")
+        ? JSON.parse(localStorage.getItem("buyNow"))
+        : JSON.parse(localStorage.getItem("cart")) || [];
+
+    let total = 0;
+    let msg = "";
+
+    items.forEach(item => {
+        let itemTotal = item.price * item.qty;
+        total += itemTotal;
+
+        msg +=
+            `${item.name}%0A` +
+            `Code: ${item.code}%0A` +
+            `Colour: ${item.color}%0A` +
+            `Qty: ${item.qty}%0A` +
+            `Price: Rs.${item.price}%0A` +
+            `Item Total: Rs.${itemTotal}%0A%0A`;
+    });
+
+    // SAVE ORDER FOR ADMIN
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders.push({
+        customer: name,
+        phone: phone,
+        items: items,
+        total: total,
+        date: new Date().toLocaleString()
+    });
+    localStorage.setItem("orders", JSON.stringify(orders));
+
+    // WHATSAPP MESSAGE
+    let text =
+        "🛒 LNKW Steel Works Order%0A%0A" +
+        msg +
+        "Total: Rs." + total + "%0A%0A" +
+        "Customer: " + name + "%0A" +
+        "Phone: " + phone;
+
+    window.open(
+        "https://wa.me/94762226839?text=" + text,
+        "_blank"
+    );
+
+    // ✅ CLEAR ONLY SELECTED ITEMS (checkoutItems)
+    localStorage.removeItem("checkoutItems");
+    if(source !== "buyNow") localStorage.removeItem("cart");
+}
+let lastInvoice = Number(localStorage.getItem("lastInvoice")) || 1000;
+let newInvoice = lastInvoice + 1;
+
+localStorage.setItem("lastInvoice", newInvoice);
+
+order.invoiceNo = "LNKW-" + newInvoice;
+
+</script>
+
+
+</body>
+</html>
+

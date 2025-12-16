@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CART</title>
+    <style>
+body{font-family:Arial;background:#f7f7f7;margin:0}
+.container{width:90%;max-width:800px;margin:20px auto;background:#fff;padding:20px;border-radius:10px}
+.item{border-bottom:1px solid #ccc;padding:10px}
+.qty-btn{padding:5px 10px;font-size:16px}
+.remove{color:red;cursor:pointer}
+.total{font-size:20px;font-weight:bold;text-align:right;margin-top:15px}
+button{padding:10px 25px;font-size:16px}
+.empty{text-align:center}
+.cart-check{
+    display:inline-flex;
+    align-items:center;
+    cursor:pointer;
+    margin-right:10px;
+}
+
+.cart-check input{
+    display:none;
+}
+
+.checkmark{
+    width:28px;
+    height:28px;
+    border:2px solid #000;
+    border-radius:6px;
+    position:relative;
+}
+
+.cart-check input:checked + .checkmark{
+    background:#25D366;
+    border-color:#25D366;
+}
+
+.cart-check input:checked + .checkmark::after{
+    content:"✔";
+    color:#fff;
+    font-size:18px;
+    position:absolute;
+    left:6px;
+    top:2px;
+}
+
+</style>
+</head>
+<body>
+    <header>
+    <script src="script.js"></script>
+    <div class="header">
+        <h1>
+            <a href="index.html">
+                <img src="logo.jpg" class="logo"></a>LNKW Steel Works
+            
+        </h1>
+            <div class="search">
+                 <input id="searchInput" type="text" placeholder="Search in LNKW Steel Works">
+                 <button onclick="doSearch()"><span>&#128269;</span></button>
+            </div>
+            <button class="cart-btn" onclick="window.location.href='cart.html'">&#128722;
+                <span id="cart-count" class="cart-count">0</span>
+            </button>
+        </div>
+    </div>
+<script>
+function doSearch() {
+    let keyword = document.getElementById("searchInput").value.trim();
+
+    if (keyword === "") {
+        alert("Please type something to search.");
+        return;
+    }
+
+    // Save search history
+    let history = JSON.parse(localStorage.getItem("searchHistory")) || [];
+    history.unshift(keyword);
+    history = history.slice(0, 10); // keep last 10 only
+    localStorage.setItem("searchHistory", JSON.stringify(history));
+
+    // Open search page
+    window.location.href = "search.html?query=" + encodeURIComponent(keyword);
+}
+
+document.getElementById("searchInput").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        doSearch();
+    }
+});
+</script>
+</header>
+
+<!-- ================= CART ================= -->
+<div class="container">
+<h2>Your Cart</h2>
+
+<div id="cartItems"></div>
+<div class="total" id="totalPrice"></div>
+
+<div id="checkoutArea" style="text-align:center;margin-top:20px;display:none">
+    <button onclick="goCheckout()">Checkout Selected</button>
+</div>
+</div>
+
+<script>
+function loadCart(){
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let box = document.getElementById("cartItems");
+    let totalBox = document.getElementById("totalPrice");
+    let checkoutArea = document.getElementById("checkoutArea");
+
+    box.innerHTML = "";
+    totalBox.innerHTML = "";
+    checkoutArea.style.display = "none";
+
+    if(cart.length === 0){
+    box.innerHTML = `
+        <div style="text-align:center;padding:30px">
+            <p style="font-size:18px">🛒 Your cart is empty</p>
+            <a href="LNKW.html.html#p">
+                <button style="
+                    margin-top:15px;
+                    padding:12px 30px;
+                    font-size:16px;
+                    background:#000;
+                    color:#fff;
+                    border:none;
+                    border-radius:5px;
+                    cursor:pointer;
+                ">
+                    Shop Now
+                </button>
+            </a>
+        </div>
+    `;
+    document.getElementById("totalPrice").innerText = "";
+    document.getElementById("checkoutArea").style.display = "none";
+    return;
+}
+
+
+    cart.forEach((item, i)=>{
+        box.innerHTML += `
+<div class="item">
+    <label class="cart-check">
+    <input type="checkbox"
+           class="item-check"
+           data-index="${i}"
+           onchange="updateTotal()">
+    <span class="checkmark"></span>
+</label>
+
+
+    <b>${item.name}</b><br>
+    Code: ${item.code}<br>
+    Colour: ${item.color}<br>
+    Price: Rs.${item.price}<br>
+
+    Qty:
+    <button class="qty-btn" onclick="changeQty(${i},-1)">-</button>
+    ${item.qty}
+    <button class="qty-btn" onclick="changeQty(${i},1)">+</button><br>
+
+    <span class="remove" onclick="removeItem(${i})">Remove</span>
+</div>
+`;
+    });
+}
+
+function changeQty(index, change){
+    let cart = JSON.parse(localStorage.getItem("cart"));
+    cart[index].qty += change;
+    if(cart[index].qty < 1) cart[index].qty = 1;
+    localStorage.setItem("cart", JSON.stringify(cart));
+    loadCart();
+}
+
+function removeItem(index){
+    let cart = JSON.parse(localStorage.getItem("cart"));
+    cart.splice(index,1);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    loadCart();
+}
+
+function updateTotal(){
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let checkboxes = document.querySelectorAll(".item-check");
+    let total = 0;
+    let selectedCount = 0;
+
+    checkboxes.forEach(cb=>{
+        if(cb.checked){
+            let item = cart[cb.dataset.index];
+            total += item.price * item.qty;
+            selectedCount++;
+        }
+    });
+
+    document.getElementById("totalPrice").innerText =
+        selectedCount ? "Selected Total: Rs. " + total : "";
+
+    document.getElementById("checkoutArea").style.display =
+        selectedCount ? "block" : "none";
+}
+
+
+function goCheckout(){
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let checkboxes = document.querySelectorAll(".item-check");
+    let selected = [];
+
+    checkboxes.forEach(cb=>{
+        if(cb.checked){
+            selected.push(cart[cb.dataset.index]);
+        }
+    });
+
+    if(selected.length === 0){
+        alert("Please select at least one item");
+        return;
+    }
+
+    localStorage.setItem("checkoutItems", JSON.stringify(selected));
+    window.location.href = "checkout.html";
+}
+
+
+loadCart();
+</script>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+    <div class="footer-container">
+
+        <!-- About Section -->
+        <div class="footer-box">
+            <h3>About Us</h3>
+            <p>Welcome to LNKW STEEL WORKS, your trusted store for high-quality garden chairs, outdoor swings, and relaxing furniture.
+We offer durable, stylish, and comfortable products designed to make your garden a beautiful and peaceful place.
+Our goal is to provide great quality at the best price with friendly service.</p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-box">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="categories.html">Categories</a></li>
+                <li><a href="index.html#product-section">Products</a></li>
+                <li><a href="#Contact">Contact Us</a></li>
+            </ul>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="footer-box" id="Contact">
+            <h3>Contact</h3>
+            <p>📍 Address: 352/1B, Horana-Colombo Road, Kahathuduwa, Polgasowita. </p>
+            <p>📞 Phone: 076 222 6839 / 077 189 6839</p>
+            <p>📧 Email: lnkwsteel@gmail.com</p>
+        </div>
+
+        <!-- Social Icons -->
+        <div class="footer-box">
+            <h3>Follow Us</h3>
+            <div class="social-links">
+                <a href="https://www.facebook.com/share/1DEyfDn3kk/">Facebook</a>
+                <a href="https://www.instagram.com/lnkw.steel.works/">Instagram</a>
+                <a href="https://www.youtube.com/@lnkwsteel">YouTube</a>
+            </div>
+        </div>
+    </div>
+<div class="whatsapp-footer-btn">
+    <a href="https://wa.me/94762226839?text=Hello%20I%20need%20more%20details" target="_blank">
+        <img src="whatsapp.png" alt="WhatsApp">
+        <span>Chat on WhatsApp</span>
+    </a>
+</div>
+
+<div class="footer-bottom">
+        <p>© 2025 Your LNKW Steel Works | All Rights Reserved.</p>
+    </div>
+
+</footer>
+
+</body>
+</html>

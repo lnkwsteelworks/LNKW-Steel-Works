@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Page</title>
+
+<style>
+            /* MAIN HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 15px;     /* Reduce header height */
+    background: #b8ff6a;   /* your green background */
+}
+
+/* LOGO + TITLE */
+.header h1 {
+    display: flex;
+    align-items: center;
+    font-size: 22px;       /* Reduce text size */
+    margin: 0;
+}
+
+.logo {
+    height: 50px;          /* Reduce logo height */
+    margin-right: 10px;
+}
+
+/* BUTTON STYLE */
+.btn, .cart-btn {
+    position: relative;
+    font-size: 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.cart-count {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background: red;
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    display: none;
+}
+
+/* SEARCH BAR */
+.search input {
+    height: 26px;          /* Reduce search bar height */
+    padding: 3px 8px;
+    font-size: 14px;
+}
+
+.search button {
+    height: 28px;
+    padding: 3px 8px;
+    cursor: pointer;
+}
+
+/* If search bar looks too tall, limit whole search box height */
+.search {
+    display: flex;
+    align-items: center;
+}
+.recent-box {
+    width: 75%;
+    margin: auto;
+    background: white;
+    border: 1px solid #ff6a00;
+    border-top: none;
+    display: none;
+    position: absolute;
+    z-index: 10;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.recent-box ul {
+    padding: 10px;
+    list-style: none;
+}
+
+.recent-box li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 5px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.recent-box li:hover {
+    background: #f5f5f5;
+}
+
+.clear-single {
+    color: red;
+    cursor: pointer;
+}
+
+.clear-all-btn {
+    width: 100%;
+    background: #ff1500;
+    color: white;
+    padding: 8px;
+    border: none;
+}
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f7f7f7;
+    }
+
+    .product-container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 20px auto;
+        background: white;
+        padding: 20px;
+        display: flex;
+        gap: 30px;
+        border-radius: 10px;
+    }
+
+    .left-section {
+        flex: 1;
+    }
+
+    .main-image {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    .thumbnail-list {
+        display: flex;
+        margin-top: 10px;
+        gap: 10px;
+    }
+
+    .thumbnail-list img {
+        width: 28%;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .thumbnail-list img:hover {
+        border-color: orange;
+    }
+
+    .right-section {
+        flex: 1;
+    }
+
+    .product-title {
+        font-size: 200%;
+        font-weight: bold;
+    }
+
+    .price-box {
+        margin-top: 10px;
+        font-size: 25px;
+        color: #ff6000;
+    }
+
+    .old-price {
+        text-decoration: line-through;
+        color: gray;
+        font-size: 20px;
+        margin-left: 10px;
+    }
+
+    .discount {
+        color: green;
+        font-size: 16px;
+        margin-left: 10px;
+    }
+
+    .quantity-box {
+        display: flex;
+        align-items: center;
+        margin: 20px 0;
+        gap: 10px;
+    }
+
+    .qty-btn {
+        width: 35px;
+        height: 35px;
+        border: none;
+        background: #ddd;
+        cursor: pointer;
+        font-size: 25px;
+        border-radius: 5px;
+    }
+
+    .qty-input {
+        width: 40px;
+        text-align: center;
+        padding: 5px;
+        border: 1px solid #ccc;
+    }
+
+    .btn-row {
+        display: flex;
+        gap: 20px;
+    }
+
+    .buy-btn, .cart {
+        flex: 1;
+        padding: 15px;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        border-radius: 8px;
+    }
+
+    .buy-btn {
+        background: #00aaff;
+    }
+
+    .cart {
+        background: #ff6c00;
+    }
+
+    /* Footer Style */
+.footer {
+    background: #222;
+    color: #fff;
+    padding: 40px 20px 20px;
+    margin-top: 40px;
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+}
+
+.footer-box h3 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #f7c02b;
+}
+
+.footer-box p,
+.footer-box a,
+.footer-box li {
+    font-size: 14px;
+    color: #ddd;
+}
+
+.footer-box ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-box ul li {
+    margin: 5px 0;
+}
+
+.footer-box a {
+    text-decoration: none;
+    color: #ddd;
+    transition: 0.3s;
+}
+
+.footer-box a:hover {
+    color: #fff;
+}
+
+.social-links a {
+    display: inline-block;
+    margin-right: 10px;
+    background: #444;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 13px;
+    transition: 0.3s;
+}
+
+.social-links a:hover {
+    background: #f7c02b;
+    color: #000;
+}
+
+/* Bottom Footer */
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #444;
+    margin-top: 20px;
+}
+
+.footer-bottom p {
+    font-size: 13px;
+    color: #ccc;
+}
+.whatsapp-footer-btn {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.whatsapp-footer-btn a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #25D366;
+    padding: 12px 22px;
+    border-radius: 40px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.whatsapp-footer-btn img {
+    width: 28px;
+    height: 28px;
+}
+
+.whatsapp-footer-btn a:hover {
+    background: #1ebe5d;
+    transform: scale(1.05);
+}
+.product-extra {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.product-details li {
+    margin: 8px 0;
+    font-size: 15px;
+}
+.stars span {
+    font-size: 30px;
+    cursor: pointer;
+    color: #ccc;
+}
+
+.stars span.active {
+    color: gold;
+}
+
+#review-list {
+    margin-top: 15px;
+}
+.color-options {
+    display: flex;
+    gap: 15px;
+    margin: 10px 0;
+}
+
+.color-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.color-circle.active {
+    border: 3px solid orange;
+}
+
+.color-text {
+    font-size: 14px;
+    color: red;
+}
+.buy-btn:disabled {
+    background: gray;
+    cursor: not-allowed;
+}
+
+
+</style>
+</head>
+
+<body>
+    <header>
+    <script src="script.js"></script>
+    <div class="header">
+        <h1>
+            <a href="index.html">
+                <img src="logo.jpg" class="logo"></a>LNKW Steel Works
+            
+        </h1>
+            <div class="search">
+                 <input id="searchInput" type="text" placeholder="Search in LNKW Steel Works">
+                 <button onclick="doSearch()"><span>&#128269;</span></button>
+            </div>
+            <button class="cart-btn" onclick="window.location.href='cart.html'">&#128722;
+                <span id="cart-count" class="cart-count">0</span>
+            </button>
+        </div>
+    </div>
+<script>
+function doSearch() {
+    let keyword = document.getElementById("searchInput").value.trim();
+
+    if (keyword === "") {
+        alert("Please type something to search.");
+        return;
+    }
+
+    // Save search history
+    let history = JSON.parse(localStorage.getItem("searchHistory")) || [];
+    history.unshift(keyword);
+    history = history.slice(0, 10); // keep last 10 only
+    localStorage.setItem("searchHistory", JSON.stringify(history));
+
+    // Open search page
+    window.location.href = "search.html?query=" + encodeURIComponent(keyword);
+}
+
+document.getElementById("searchInput").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        doSearch();
+    }
+});
+</script>
+</header>
+
+<div class="product-container">
+
+    <!-- LEFT SIDE -->
+    <div class="left-section">
+        <img id="mainImage" src="products/img14.jpg" class="main-image">
+
+        <div class="thumbnail-list">
+            <img src="products/img14.jpg" onclick="changeImage('products/img14.jpg')">
+            <img src="products/img14.1.jpg" onclick="changeImage('products/img14.1.jpg')">
+        </div>
+    </div>
+
+
+    <!-- RIGHT SIDE -->
+    <div class="right-section">
+
+        <div class="product-title">
+            King big Chairs design with big table (CHAIR SET)
+        </div>
+
+        <div class="price-box">
+            Rs. 110,000 
+            <span class="old-price">Rs. 115,000</span>
+            <span class="discount">[C008]</span>
+        </div>
+
+        <div class="quantity-box">
+            <span>Quantity:</span>
+            <button class="qty-btn" onclick="dec()">-</button>
+            <input id="qty" class="qty-input" value="1">
+            <button class="qty-btn" onclick="inc()">+</button>
+        </div>
+        <div class="color-box">
+    <p><strong>Select Colour:</strong></p>
+
+    <div class="color-options">
+        <span class="color-circle"
+        style="background:black"
+        onclick="selectColor(this,'Black','products/img14.1.jpg')"></span>
+
+<span class="color-circle"
+      style="background:white; border:1px solid #ccc"
+      onclick="selectColor(this,'White','products/img14.jpg')"></span>
+
+
+    </div>
+
+    <p id="selectedColorText" class="color-text">No colour selected</p>
+</div>
+
+        <div class="btn-row">
+            <button id="buyBtn" class="buy-btn" disabled onclick="buyNow()">Buy Now</button>
+
+
+            <button class="cart" onclick="addToCart(
+                'C008',
+                'King big Chairs design with big table (CHAIR SET)',
+                 110000,
+                 document.getElementById('mainImage').src,
+                 selectedColor
+                 )">Add to Cart</button>
+
+
+
+        </div>
+        <div id="average-rating" style="margin-top:30px; font-size:25px;"></div>
+
+    </div>
+</div>
+<div class="product-extra">
+
+    <h2>Product Details</h2>
+    <ul class="product-details">
+        <li><strong>Material:</strong> High-quality Cast Alumminium</li>
+        <li><strong>Usage:</strong> Balcony / Garden / Rooftop</li>
+        <li><strong>Includes:</strong> 4 Chairs + 1 Table</li>
+        <li><strong>Finish:</strong> Brilliant White auto paint / black Qd primer</li>
+        <li><strong>Warranty:</strong> 1 Year (not for paint)</li>
+    </ul>
+
+</div>
+<div class="product-extra">
+
+    <h2>Customer Reviews</h2>
+
+    <div class="stars" id="star-box">
+        <span onclick="rate(1)">★</span>
+        <span onclick="rate(2)">★</span>
+        <span onclick="rate(3)">★</span>
+        <span onclick="rate(4)">★</span>
+        <span onclick="rate(5)">★</span>
+    </div>
+
+    <textarea id="review-text" placeholder="Write your review..." rows="3"></textarea>
+    <br><br>
+    <button onclick="submitReview()">Submit Review</button>
+
+    <div id="review-list"></div>
+
+</div>
+
+
+<script>
+let selectedColor = null;
+
+/* ================= COLOR SELECT ================= */
+function selectColor(element, color, image) {
+    selectedColor = color;
+
+    document.getElementById("mainImage").src = image;
+
+    document.getElementById("selectedColorText").innerText =
+        "Selected colour: " + color;
+    document.getElementById("selectedColorText").style.color = "green";
+
+    document.getElementById("buyBtn").disabled = false;
+
+    document.querySelectorAll(".color-circle").forEach(c =>
+        c.classList.remove("active")
+    );
+
+    element.classList.add("active");
+}
+
+function inc() {
+    let qty = document.getElementById("qty");
+    qty.value = Number(qty.value) + 1;
+}
+
+function dec() {
+    let qty = document.getElementById("qty");
+    if (qty.value > 1) qty.value = Number(qty.value) - 1;
+}
+
+function addToCart(code, name, price, image, color) {
+    if (!color) {
+        alert("Please select a colour first!");
+        return;
+    }
+
+    let qty = Number(document.getElementById("qty").value);
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    let existing = cart.find(item =>
+        item.code === code && item.color === color
+    );
+
+    if (existing) {
+        existing.qty += qty;
+    } else {
+        cart.push({
+            code,
+            name,
+            price,
+            image,
+            color,
+            qty
+        });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert("Item added to cart 🛒");
+}
+
+
+function buyNow() {
+
+    if (!selectedColor) {
+        alert("Please select a colour first!");
+        return;
+    }
+
+    let qty = Number(document.getElementById("qty").value);
+
+    let buyNowItem = [{
+        code: "C008",
+        name: "King big Chairs design with big table (CHAIR SET)",
+        price: 110000,
+        image: document.getElementById("mainImage").src,
+        color: selectedColor,
+        qty: qty
+    }];
+
+    // SAVE ONLY THIS ITEM
+    localStorage.setItem("buyNow", JSON.stringify(buyNowItem));
+
+    // GO DIRECTLY TO CHECKOUT
+    window.location.href = "checkout.html";
+}
+function changeImage(src) {
+    document.getElementById("mainImage").src = src;
+}
+
+</script>
+
+<footer class="footer">
+    <div class="footer-container">
+
+        <!-- About Section -->
+        <div class="footer-box">
+            <h3>About Us</h3>
+            <p>Welcome to LNKW STEEL WORKS, your trusted store for high-quality garden chairs, outdoor swings, and relaxing furniture.
+We offer durable, stylish, and comfortable products designed to make your garden a beautiful and peaceful place.
+Our goal is to provide great quality at the best price with friendly service.</p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-box">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="categories.html">Categories</a></li>
+                <li><a href="index.html#product-section">Products</a></li>
+                <li><a href="#Contact">Contact Us</a></li>
+            </ul>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="footer-box" id="Contact">
+            <h3>Contact</h3>
+            <p>📍 Address: 352/1B, Horana-Colombo Road, Kahathuduwa, Polgasowita. </p>
+            <p>📞 Phone: 076 222 6839 / 077 189 6839</p>
+            <p>📧 Email: lnkwsteel@gmail.com</p>
+        </div>
+
+        <!-- Social Icons -->
+        <div class="footer-box">
+            <h3>Follow Us</h3>
+            <div class="social-links">
+                <a href="https://www.facebook.com/share/1DEyfDn3kk/">Facebook</a>
+                <a href="https://www.instagram.com/lnkw.steel.works/">Instagram</a>
+                <a href="https://www.youtube.com/@lnkwsteel">YouTube</a>
+            </div>
+        </div>
+    </div>
+<div class="whatsapp-footer-btn">
+    <a href="https://wa.me/94762226839?text=Hello%20I%20need%20more%20details" target="_blank">
+        <img src="whatsapp.png" alt="WhatsApp">
+        <span>Chat on WhatsApp</span>
+    </a>
+</div>
+
+<div class="footer-bottom">
+        <p>© 2025 Your LNKW Steel Works | All Rights Reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>
